@@ -1,0 +1,29 @@
+# node
+node_modules
+**/node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Build output
+dist
+**/dist
+*.tsbuildinfo
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Git
+.git
+.gitignore
+
+# OS / IDE
+.DS_Store
+.env
+**/.env
+.vscode
+.idea
+
+# coverage
+coverage

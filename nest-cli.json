@@ -1,0 +1,27 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "webpack": false
+  },
+  "projects": {
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth/src"
+    },
+    "event": {
+      "type": "application",
+      "root": "apps/event",
+      "entryFile": "main",
+      "sourceRoot": "apps/event/src"
+    },
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "reward-assignment-subo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"nest start auth --watch\" \"nest start event --watch\" \"nest start gateway --watch\"",
+    "build": "nest build --projects auth,event,gateway",
+    "lint": "eslint apps --ext .ts",
+    "format": "prettier --write .",
+    "build:auth": "nest build apps/auth",
+    "build:event": "nest build apps/event",
+    "build:gateway": "nest build apps/gateway"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3"
+  }
+}
