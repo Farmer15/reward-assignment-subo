@@ -1,8 +1,18 @@
-import { Body, Controller, InternalServerErrorException, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Post,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { JwtService } from "@nestjs/jwt";
 import { LoginUserDto } from "./dto/login-user.dto";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { Request } from "express";
 
 @Controller("auth")
 export class UserController {
@@ -16,7 +26,7 @@ export class UserController {
     const user = await this.userService.create(createUserDto);
 
     return {
-      message: "회원가입 성공",
+      message: "회원가입 성공했습니다.",
       user: {
         id: user._id,
         email: user.email,
@@ -38,6 +48,15 @@ export class UserController {
     return {
       message: "로그인 성공",
       accessToken: token,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("me")
+  getProfile(@Req() req: Request) {
+    return {
+      message: "내 정보 조회 성공했습니다.",
+      user: req.user,
     };
   }
 }

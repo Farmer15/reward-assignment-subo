@@ -4,6 +4,7 @@ import { User, UserSchema } from "./schemas/user.schema";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { JwtModule } from "@nestjs/jwt";
+import { JwtStrategy } from "../auth/jwt.strategy";
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { JwtModule } from "@nestjs/jwt";
     }),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, JwtStrategy],
   exports: [UserService],
 })
 export class UserModule {}
