@@ -9,7 +9,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:prod": "node dist/main",
-      "build": "nest build"
+    "build": "nest build"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -17,8 +17,14 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/platform-express": "^11.0.1",
+    "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "mongoose": "^8.14.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2"
   }
 }
