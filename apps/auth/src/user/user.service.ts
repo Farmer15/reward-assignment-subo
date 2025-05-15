@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from "@nestjs/common";
+import { Injectable, ConflictException, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import * as bcrypt from "bcrypt";
@@ -24,5 +24,19 @@ export class UserService {
     });
 
     return createdUser.save();
+  }
+
+  async validateUser(email: string, password: string): Promise<UserDocument> {
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new UnauthorizedException("존재하지 않는 이메일입니다.");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
+    }
+
+    return user;
   }
 }
