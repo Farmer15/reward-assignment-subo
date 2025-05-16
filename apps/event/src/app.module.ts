@@ -2,6 +2,7 @@ import { Module, Logger } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { EventModule } from "./event/event.module";
+import { RewardModule } from "./reward/reward.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { EventModule } from "./event/event.module";
       },
     }),
     EventModule,
+    RewardModule,
   ],
 })
 export class AppModule {}
