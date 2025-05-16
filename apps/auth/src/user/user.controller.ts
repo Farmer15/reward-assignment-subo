@@ -42,7 +42,7 @@ export class UserController {
       throw new InternalServerErrorException("유저 ID가 존재하지 않습니다.");
     }
 
-    const payload = { sub: user._id.toString(), email: user.email };
+    const payload = { sub: user._id.toString(), email: user.email, role: user.role };
     const token = await this.jwtService.signAsync(payload);
 
     return {

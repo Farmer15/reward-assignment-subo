@@ -1,12 +1,18 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { RewardService } from "./reward.service";
 import { CreateRewardDto } from "./dto/create-reward.dto";
+import { JwtAuthGuard } from "apps/auth/src/auth/jwt-auth.guard";
+import { RolesGuard } from "libs/auth/src/roles.guard";
+import { UserRole } from "apps/auth/src/user/types/user-role";
+import { Roles } from "libs/auth/src/roles.decorator";
 
 @Controller("rewards")
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class RewardController {
   constructor(private readonly rewardService: RewardService) {}
 
   @Post()
+  @Roles(UserRole.OPERATOR, UserRole.ADMIN)
   async createReward(@Body() dto: CreateRewardDto) {
     const reward = await this.rewardService.create(dto);
 
@@ -17,6 +23,7 @@ export class RewardController {
   }
 
   @Get()
+  @Roles(UserRole.AUDITOR, UserRole.ADMIN)
   async getAllRewards() {
     const rewards = await this.rewardService.findAll();
 
@@ -27,6 +34,7 @@ export class RewardController {
   }
 
   @Get("event/:eventId")
+  @Roles(UserRole.AUDITOR, UserRole.ADMIN)
   async getRewardsByEvent(@Param("eventId") eventId: string) {
     const rewards = await this.rewardService.findByEvent(eventId);
     return {
