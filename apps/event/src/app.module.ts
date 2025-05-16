@@ -1,6 +1,7 @@
 import { Module, Logger } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
+import { EventModule } from "./event/event.module";
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MongooseModule } from "@nestjs/mongoose";
         }
       },
     }),
+    EventModule,
   ],
 })
 export class AppModule {}
