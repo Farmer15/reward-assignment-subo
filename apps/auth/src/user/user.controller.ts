@@ -4,7 +4,6 @@ import {
   Get,
   InternalServerErrorException,
   Post,
-  Req,
   UseGuards,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -13,6 +12,7 @@ import { JwtService } from "@nestjs/jwt";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { Request } from "express";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { CurrentUser } from "libs/auth/src/decorators/current-user.decorator";
 
 @Controller("auth")
 export class UserController {
@@ -53,7 +53,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get("me")
-  getProfile(@Req() req: Request) {
+  getProfile(@CurrentUser() req: Request) {
     return {
       message: "내 정보 조회 성공했습니다.",
       user: req.user,
