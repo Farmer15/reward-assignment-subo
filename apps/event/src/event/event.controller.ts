@@ -1,10 +1,10 @@
 import { Body, Controller, Post, UseGuards } from "@nestjs/common";
 import { EventService } from "./event.service";
 import { CreateEventDto } from "./dto/create-event.dto";
-import { RolesGuard } from "libs/auth/src/roles.guard";
+import { RolesGuard } from "libs/auth/src/guards/roles.guard";
 import { JwtAuthGuard } from "apps/auth/src/auth/jwt-auth.guard";
 import { UserRole } from "apps/auth/src/user/types/user-role";
-import { Roles } from "libs/auth/src/roles.decorator";
+import { Roles } from "libs/auth/src/decorators/roles.decorator";
 
 @Controller("events")
 @UseGuards(JwtAuthGuard, RolesGuard)
