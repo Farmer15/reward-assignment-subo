@@ -3,11 +3,18 @@ import { ConfigModule } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { EventModule } from "./event/event.module";
 import { RewardModule } from "./reward/reward.module";
+import { ClaimModule } from "./claim/claim.module";
+import { JwtModule } from "@nestjs/jwt";
+import { JwtStrategy } from "apps/auth/src/auth/jwt.strategy";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: "1h" },
     }),
     MongooseModule.forRootAsync({
       useFactory: async () => {
@@ -35,6 +42,8 @@ import { RewardModule } from "./reward/reward.module";
     }),
     EventModule,
     RewardModule,
+    ClaimModule,
   ],
+  providers: [JwtStrategy],
 })
 export class AppModule {}

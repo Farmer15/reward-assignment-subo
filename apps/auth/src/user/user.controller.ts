@@ -11,8 +11,8 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { JwtService } from "@nestjs/jwt";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { Request } from "express";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
 @Controller("auth")
 export class UserController {
