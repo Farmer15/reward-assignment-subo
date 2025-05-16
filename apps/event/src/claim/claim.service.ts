@@ -18,6 +18,14 @@ export class ClaimService {
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
+  async findClaimsByUser(userId: string): Promise<Claim[]> {
+    return this.claimModel.find({ userId }).populate("rewardId").exec();
+  }
+
+  async findAllClaims(): Promise<Claim[]> {
+    return this.claimModel.find().populate("rewardId").exec();
+  }
+
   async claimReward(userId: string, rewardId: string): Promise<Claim> {
     const session = await this.connection.startSession();
 

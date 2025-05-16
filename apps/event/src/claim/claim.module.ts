@@ -4,6 +4,7 @@ import { ClaimController } from "./claim.controller";
 import { ClaimService } from "./claim.service";
 import { Claim, ClaimSchema } from "./schema/claim.schema";
 import { Reward, RewardSchema } from "../reward/schema/reward.schema";
+import { ClaimHistoryController } from "./claim-history.controller";
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { Reward, RewardSchema } from "../reward/schema/reward.schema";
       { name: Reward.name, schema: RewardSchema },
     ]),
   ],
-  controllers: [ClaimController],
+  controllers: [ClaimController, ClaimHistoryController],
   providers: [ClaimService],
 })
 export class ClaimModule {}

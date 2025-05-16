@@ -6,13 +6,13 @@
     "libs/*"
   ],
   "scripts": {
-    "dev": "concurrently \"nest start auth --watch\" \"nest start event --watch\" \"nest start gateway --watch\"",
-    "build": "nest build --projects auth,event,gateway",
-    "lint": "eslint apps --ext .ts",
-    "format": "prettier --write .",
+    "dev": "concurrently \"nest start apps/auth\" \"nest start apps/event\" \"nest start apps/gateway\"",
+    "build": "npm run build:auth && npm run build:event && npm run build:gateway",
     "build:auth": "nest build apps/auth",
     "build:event": "nest build apps/event",
-    "build:gateway": "nest build apps/gateway"
+    "build:gateway": "nest build apps/gateway",
+    "lint": "eslint apps --ext .ts",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",
