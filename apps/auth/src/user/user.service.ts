@@ -1,19 +1,70 @@
-import { Injectable, ConflictException, UnauthorizedException } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
+} from "@nestjs/common";
+import { InjectConnection, InjectModel } from "@nestjs/mongoose";
+import { Connection, Model } from "mongoose";
 import * as bcrypt from "bcrypt";
 import { User, UserDocument } from "./schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { UserRole } from "./types/user-role";
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectConnection() private readonly connection: Connection,
+  ) {}
+
+  async updateUserRole(userId: string, role: UserRole) {
+    const session = await this.connection.startSession();
+
+    try {
+      const result = await session.withTransaction(async () => {
+        const user = await this.userModel.findById(userId).session(session);
+        if (!user) {
+          throw new NotFoundException("해당 ID의 유저를 찾을 수 없습니다.");
+        }
+
+        const isValidRole = Object.values(UserRole).includes(role);
+        if (!isValidRole) {
+          throw new BadRequestException("유효하지 않은 역할입니다.");
+        }
+
+        if (user.role === role) {
+          throw new ConflictException("이미 해당 역할을 가진 유저입니다.");
+        }
+
+        user.role = role;
+        const updatedUser = await user.save({ session });
+
+        return {
+          message: "역할이 성공적으로 변경되었습니다.",
+          user: {
+            id: updatedUser._id,
+            email: updatedUser.email,
+            role: updatedUser.role,
+          },
+        };
+      });
+
+      return result;
+    } finally {
+      await session.endSession();
+    }
+  }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existing = await this.userModel.findOne({ email: createUserDto.email });
-
     if (existing) {
       throw new ConflictException("이미 존재하는 이메일입니다.");
+    }
+
+    if (createUserDto.password.length < 6) {
+      throw new BadRequestException("비밀번호는 최소 6자리 이상이어야 합니다.");
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -29,7 +80,7 @@ export class UserService {
   async validateUser(email: string, password: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({ email });
     if (!user) {
-      throw new UnauthorizedException("존재하지 않는 이메일입니다.");
+      throw new UnauthorizedException("해당 이메일로 등록된 유저가 없습니다.");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

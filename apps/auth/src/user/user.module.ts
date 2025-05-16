@@ -5,6 +5,7 @@ import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 import { JwtModule } from "@nestjs/jwt";
 import { JwtStrategy } from "../auth/jwt.strategy";
+import { UserRoleController } from "./user-role.controller";
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { JwtStrategy } from "../auth/jwt.strategy";
       signOptions: { expiresIn: "1h" },
     }),
   ],
-  controllers: [UserController],
+  controllers: [UserController, UserRoleController],
   providers: [UserService, JwtStrategy],
   exports: [UserService],
 })
