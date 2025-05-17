@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
+import { EventCondition } from "../types/event-condition.enum";
 
 export type EventDocument = Event & Document;
 
@@ -25,6 +26,9 @@ export class Event {
 
   @Prop({ default: 1 })
   maxRewardCount: number = 1;
+
+  @Prop({ required: true, enum: EventCondition })
+  condition!: EventCondition;
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

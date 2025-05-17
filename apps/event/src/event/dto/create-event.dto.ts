@@ -1,4 +1,5 @@
-import { IsString, IsDateString, IsIn, IsNumber, Min } from "class-validator";
+import { IsString, IsDateString, IsIn, IsNumber, Min, IsNotEmpty, IsEnum } from "class-validator";
+import { EventCondition } from "../types/event-condition.enum";
 
 export class CreateEventDto {
   @IsString()
@@ -22,4 +23,7 @@ export class CreateEventDto {
   @IsNumber()
   @Min(1)
   maxRewardCount: number = 1;
+
+  @IsEnum(EventCondition)
+  condition!: EventCondition;
 }
