@@ -1,18 +1,11 @@
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Post,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { JwtService } from "@nestjs/jwt";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { Request } from "express";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CurrentUser } from "libs/auth/src/decorators/current-user.decorator";
+import { AuthUser } from "../types/auth-user.interface";
 
 @Controller("auth")
 export class UserController {
@@ -30,6 +23,7 @@ export class UserController {
       user: {
         id: user._id,
         email: user.email,
+        role: user.role,
       },
     };
   }
@@ -38,11 +32,11 @@ export class UserController {
   async login(@Body() dto: LoginUserDto) {
     const user = await this.userService.validateUser(dto.email, dto.password);
 
-    if (!user._id) {
-      throw new InternalServerErrorException("유저 ID가 존재하지 않습니다.");
-    }
-
-    const payload = { sub: user._id.toString(), email: user.email, role: user.role };
+    const payload = {
+      sub: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    };
     const token = await this.jwtService.signAsync(payload);
 
     return {
@@ -53,10 +47,10 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get("me")
-  getProfile(@CurrentUser() req: Request) {
+  getProfile(@CurrentUser() user: AuthUser) {
     return {
       message: "내 정보 조회 성공했습니다.",
-      user: req.user,
+      user,
     };
   }
 }

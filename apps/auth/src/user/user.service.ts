@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   BadRequestException,
+  InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { Connection, Model } from "mongoose";
@@ -11,6 +12,7 @@ import * as bcrypt from "bcrypt";
 import { User, UserDocument } from "./schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserRole } from "./types/user-role";
+import { UpdateUserRoleResult } from "./types/user-service.types";
 
 @Injectable()
 export class UserService {
@@ -19,18 +21,19 @@ export class UserService {
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
-  async updateUserRole(userId: string, role: UserRole) {
+  async updateUserRole(userId: string, role: UserRole): Promise<UpdateUserRoleResult> {
     const session = await this.connection.startSession();
 
     try {
-      const result = await session.withTransaction(async () => {
+      let result;
+
+      await session.withTransaction(async () => {
         const user = await this.userModel.findById(userId).session(session);
         if (!user) {
           throw new NotFoundException("해당 ID의 유저를 찾을 수 없습니다.");
         }
 
-        const isValidRole = Object.values(UserRole).includes(role);
-        if (!isValidRole) {
+        if (!Object.values(UserRole).includes(role)) {
           throw new BadRequestException("유효하지 않은 역할입니다.");
         }
 
@@ -41,7 +44,7 @@ export class UserService {
         user.role = role;
         const updatedUser = await user.save({ session });
 
-        return {
+        result = {
           message: "역할이 성공적으로 변경되었습니다.",
           user: {
             id: updatedUser._id,
@@ -51,7 +54,15 @@ export class UserService {
         };
       });
 
+      if (!result) {
+        throw new InternalServerErrorException("트랜잭션 처리 중 알 수 없는 오류가 발생했습니다.");
+      }
+
       return result;
+    } catch (error) {
+      throw error instanceof Error
+        ? error
+        : new InternalServerErrorException("역할 변경 중 서버 오류가 발생했습니다.");
     } finally {
       await session.endSession();
     }
@@ -67,23 +78,29 @@ export class UserService {
       throw new BadRequestException("비밀번호는 최소 6자리 이상이어야 합니다.");
     }
 
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    try {
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    const createdUser = new this.userModel({
-      email: createUserDto.email,
-      password: hashedPassword,
-    });
+      const createdUser = new this.userModel({
+        email: createUserDto.email,
+        password: hashedPassword,
+      });
 
-    return createdUser.save();
+      return await createdUser.save();
+    } catch (error) {
+      throw new InternalServerErrorException("회원가입 중 서버 오류가 발생했습니다.");
+    }
   }
 
   async validateUser(email: string, password: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({ email });
+
     if (!user) {
       throw new UnauthorizedException("해당 이메일로 등록된 유저가 없습니다.");
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
     }

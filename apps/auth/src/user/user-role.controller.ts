@@ -14,11 +14,11 @@ export class UserRoleController {
   @Patch(":id/role")
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   async updateUserRole(@Param("id") userId: string, @Body() dto: UpdateUserRoleDto) {
-    const updated = await this.userService.updateUserRole(userId, dto.role);
+    const result = await this.userService.updateUserRole(userId, dto.role);
 
     return {
       message: "유저 권한 변경에 성공했습니다.",
-      user: updated,
+      user: result.user,
     };
   }
 }
