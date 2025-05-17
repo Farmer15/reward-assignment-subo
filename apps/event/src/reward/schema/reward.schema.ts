@@ -6,7 +6,7 @@ export type RewardDocument = Reward & Document;
 @Schema({ timestamps: true })
 export class Reward {
   @Prop({ required: true })
-  name: string = "";
+  name!: string ;
 
   @Prop()
   description: string = "";
