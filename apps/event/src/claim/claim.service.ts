@@ -20,6 +20,108 @@ export class ClaimService {
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
+  async claimReward(userId: string, rewardId: string): Promise<Claim> {
+    const session = await this.connection.startSession();
+
+    try {
+      let claim: Claim;
+
+      await session.withTransaction(async () => {
+        const reward = await this.rewardModel.findById(rewardId).session(session);
+        if (!reward) {
+          claim = (
+            await this.claimModel.create(
+              [{ userId, rewardId, status: "failed", reason: "보상을 찾을 수 없습니다." }],
+              { session },
+            )
+          )[0];
+
+          throw new NotFoundException("보상을 찾을 수 없습니다.");
+        }
+
+        const event = await this.eventModel.findById(reward.eventId).session(session);
+        if (!event) {
+          claim = (
+            await this.claimModel.create(
+              [
+                {
+                  userId,
+                  rewardId,
+                  status: "failed",
+                  reason: "보상과 연결된 이벤트를 찾을 수 없습니다.",
+                },
+              ],
+              { session },
+            )
+          )[0];
+
+          throw new NotFoundException("보상과 연결된 이벤트를 찾을 수 없습니다.");
+        }
+
+        if (event.status !== "active") {
+          claim = (
+            await this.claimModel.create(
+              [{ userId, rewardId, status: "failed", reason: "현재 비활성화된 이벤트입니다." }],
+              { session },
+            )
+          )[0];
+
+          throw new BadRequestException("현재 비활성화된 이벤트입니다.");
+        }
+
+        const now = new Date();
+        if (now < event.startDate || now > event.endDate) {
+          claim = (
+            await this.claimModel.create(
+              [{ userId, rewardId, status: "failed", reason: "이벤트 기간이 아닙니다." }],
+              { session },
+            )
+          )[0];
+
+          throw new BadRequestException("이벤트 기간이 아닙니다.");
+        }
+
+        const exists = await this.claimModel
+          .exists({ userId: new Types.ObjectId(userId), rewardId: reward._id })
+          .session(session);
+        if (exists) {
+          claim = (
+            await this.claimModel.create(
+              [{ userId, rewardId, status: "failed", reason: "이미 해당 보상을 신청하셨습니다." }],
+              { session },
+            )
+          )[0];
+
+          throw new ConflictException("이미 해당 보상을 신청하셨습니다.");
+        }
+
+        if (reward.isLimited && reward.quantity <= 0) {
+          claim = (
+            await this.claimModel.create(
+              [{ userId, rewardId, status: "failed", reason: "보상이 모두 소진되었습니다." }],
+              { session },
+            )
+          )[0];
+
+          throw new BadRequestException("보상이 모두 소진되었습니다.");
+        }
+
+        if (reward.isLimited) {
+          reward.quantity -= 1;
+          await reward.save({ session });
+        }
+
+        claim = (
+          await this.claimModel.create([{ userId, rewardId, status: "success" }], { session })
+        )[0];
+      });
+
+      return claim!;
+    } finally {
+      await session.endSession();
+    }
+  }
+
   async findClaimsByUser(userId: string): Promise<Claim[]> {
     const claims = await this.claimModel.find({ userId }).populate("rewardId").exec();
 
@@ -38,62 +140,6 @@ export class ClaimService {
     }
 
     return claims;
-  }
-
-  async claimReward(userId: string, rewardId: string): Promise<Claim> {
-    const session = await this.connection.startSession();
-
-    try {
-      let result: Claim;
-
-      await session.withTransaction(async () => {
-        const reward = await this.rewardModel.findById(rewardId).session(session);
-        if (!reward) {
-          throw new NotFoundException("보상을 찾을 수 없습니다.");
-        }
-
-        const event = await this.eventModel.findById(reward.eventId).session(session);
-        if (!event) {
-          throw new NotFoundException("보상과 연결된 이벤트를 찾을 수 없습니다.");
-        }
-
-        if (event.status !== "active") {
-          throw new BadRequestException("현재 비활성화된 이벤트입니다.");
-        }
-
-        const now = new Date();
-        if (now < event.startDate || now > event.endDate) {
-          throw new BadRequestException("이벤트 기간이 아닙니다.");
-        }
-
-        const exists = await this.claimModel
-          .exists({
-            userId: new Types.ObjectId(userId),
-            rewardId: reward._id,
-          })
-          .session(session);
-        if (exists) {
-          throw new ConflictException("이미 해당 보상을 신청하셨습니다.");
-        }
-
-        if (reward.isLimited && reward.quantity <= 0) {
-          throw new BadRequestException("보상이 모두 소진되었습니다.");
-        }
-
-        if (reward.isLimited) {
-          reward.quantity -= 1;
-          await reward.save({ session });
-        }
-
-        result = await this.claimModel
-          .create([{ userId, rewardId }], { session })
-          .then((r) => r[0]);
-      });
-
-      return result!;
-    } finally {
-      await session.endSession();
-    }
   }
 
   async findFilteredClaims(filters: { eventId?: string; userId?: string }): Promise<Claim[]> {
