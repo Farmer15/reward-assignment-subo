@@ -1,4 +1,4 @@
-import { IsString, IsDateString, IsNumber } from "class-validator";
+import { IsString, IsDateString, IsIn, IsNumber, Min } from "class-validator";
 
 export class CreateEventDto {
   @IsString()
@@ -13,12 +13,13 @@ export class CreateEventDto {
   @IsDateString()
   endDate: string = "";
 
-  @IsString()
+  @IsIn(["scheduled", "active", "ended"])
   status: "scheduled" | "active" | "ended" = "scheduled";
 
-  @IsString()
+  @IsIn(["once", "daily", "weekly"])
   rewardType: "once" | "daily" | "weekly" = "once";
 
   @IsNumber()
+  @Min(1)
   maxRewardCount: number = 1;
 }
