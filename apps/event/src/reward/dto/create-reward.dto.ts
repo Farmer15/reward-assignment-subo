@@ -9,7 +9,7 @@ export class CreateRewardDto {
   description: string = "";
 
   @IsMongoId()
-  eventId: string = "";
+  eventId!: string;
 
   @IsInt()
   @Min(0)

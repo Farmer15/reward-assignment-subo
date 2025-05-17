@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types, Document } from "mongoose";
+import mongoose, { Types, Document } from "mongoose";
 
 export type RewardDocument = Reward & Document;
 
@@ -11,8 +11,8 @@ export class Reward {
   @Prop()
   description: string = "";
 
-  @Prop({ required: true, type: Types.ObjectId, ref: "Event" })
-  eventId: Types.ObjectId = new Types.ObjectId();
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Event", required: true })
+  eventId!: Types.ObjectId;
 
   @Prop({ default: 0 })
   quantity: number = 0;
