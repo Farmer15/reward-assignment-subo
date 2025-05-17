@@ -95,4 +95,20 @@ export class ClaimService {
       await session.endSession();
     }
   }
+
+  async findFilteredClaims(filters: { eventId?: string; userId?: string }): Promise<Claim[]> {
+    const query: Record<string, unknown> = {};
+
+    if (filters.eventId) {
+      const rewardIds = await this.rewardModel.find({ eventId: filters.eventId }).distinct("_id");
+
+      query["rewardId"] = { $in: rewardIds };
+    }
+
+    if (filters.userId) {
+      query["userId"] = filters.userId;
+    }
+
+    return this.claimModel.find(query).populate("rewardId").exec();
+  }
 }

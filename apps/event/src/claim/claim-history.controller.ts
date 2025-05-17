@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "apps/auth/src/auth/jwt-auth.guard";
 import { RolesGuard } from "libs/auth/src/guards/roles.guard";
 import { ClaimService } from "./claim.service";
@@ -38,6 +38,17 @@ export class ClaimHistoryController {
     const claims = await this.claimService.findClaimsByUser(userId);
     return {
       message: `유저(${userId}) 보상 이력 조회에 성공했습니다.`,
+      claims,
+    };
+  }
+
+  @Get("filter")
+  @Roles(UserRole.OPERATOR, UserRole.AUDITOR, UserRole.ADMIN)
+  async getFilteredClaims(@Query("eventId") eventId?: string, @Query("userId") userId?: string) {
+    const claims = await this.claimService.findFilteredClaims({ eventId, userId });
+
+    return {
+      message: "필터링된 보상 이력 조회에 성공했습니다.",
       claims,
     };
   }
