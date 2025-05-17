@@ -21,7 +21,7 @@ export class UserController {
     return {
       message: "회원가입 성공했습니다.",
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         role: user.role,
       },
@@ -33,7 +33,7 @@ export class UserController {
     const user = await this.userService.validateUser(dto.email, dto.password);
 
     const payload = {
-      sub: user._id.toString(),
+      sub: user.id.toString(),
       email: user.email,
       role: user.role,
     };

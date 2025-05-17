@@ -68,7 +68,7 @@ export class UserService {
     }
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const existing = await this.userModel.findOne({ email: createUserDto.email });
     if (existing) {
       throw new ConflictException("이미 존재하는 이메일입니다.");
