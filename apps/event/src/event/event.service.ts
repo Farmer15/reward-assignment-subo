@@ -11,6 +11,12 @@ export class EventService {
   async create(createEventDto: CreateEventDto): Promise<Event> {
     const { name, startDate, endDate } = createEventDto;
 
+    const existing = await this.eventModel.findOne({ name });
+
+    if (existing) {
+      throw new BadRequestException("이미 동일한 이름의 이벤트가 존재합니다.");
+    }
+
     if (new Date(startDate) >= new Date(endDate)) {
       throw new BadRequestException("이벤트 시작일은 종료일보다 이전이어야 합니다.");
     }
@@ -18,6 +24,7 @@ export class EventService {
     try {
       return await this.eventModel.create(createEventDto);
     } catch (error) {
+      console.error("Event create error:", error);
       throw new InternalServerErrorException("이벤트 생성 중 오류가 발생했습니다.");
     }
   }

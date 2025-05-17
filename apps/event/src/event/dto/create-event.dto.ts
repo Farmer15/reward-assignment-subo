@@ -7,11 +7,11 @@ export class CreateEventDto {
   @IsString()
   description: string = "";
 
-  @IsDateString()
-  startDate: string = "";
+  @IsDateString({}, { message: "유효한 시작일 형식이 아닙니다." })
+  startDate!: string;
 
-  @IsDateString()
-  endDate: string = "";
+  @IsDateString({}, { message: "유효한 종료일 형식이 아닙니다." })
+  endDate!: string;
 
   @IsIn(["scheduled", "active", "ended"])
   status: "scheduled" | "active" | "ended" = "scheduled";
