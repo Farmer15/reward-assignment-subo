@@ -6,6 +6,7 @@ import { Roles } from "libs/auth/src/decorators/roles.decorator";
 import { CurrentUser } from "libs/auth/src/decorators/current-user.decorator";
 import { AuthUser } from "apps/auth/src/types/auth-user.interface";
 import { UserRole } from "apps/auth/src/user/types/user-role";
+import { FilterClaimDto } from "./dto/filter-claim.dto";
 
 @Controller("claims")
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -43,9 +44,9 @@ export class ClaimHistoryController {
   }
 
   @Get("filter")
-  @Roles(UserRole.OPERATOR, UserRole.AUDITOR, UserRole.ADMIN)
-  async getFilteredClaims(@Query("eventId") eventId?: string, @Query("userId") userId?: string) {
-    const claims = await this.claimService.findFilteredClaims({ eventId, userId });
+  @Roles(UserRole.ADMIN, UserRole.OPERATOR, UserRole.AUDITOR)
+  async filterClaims(@Query() query: FilterClaimDto) {
+    const claims = await this.claimService.findFilteredClaims(query);
 
     return {
       message: "필터링된 보상 이력 조회에 성공했습니다.",
