@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
 } from "@nestjs/common";
 import { InjectModel, InjectConnection } from "@nestjs/mongoose";
-import { Connection, Model, Types } from "mongoose";
+import { ClientSession, Connection, Model, Types } from "mongoose";
 import { Claim, ClaimDocument } from "./schema/claim.schema";
 import { Reward, RewardDocument } from "../reward/schema/reward.schema";
 import { Event, EventDocument } from "../event/schemas/event.schema";
@@ -127,7 +127,7 @@ export class ClaimService {
     userId: string,
     rewardId: string,
     reason: string,
-    session: any,
+    session: ClientSession,
   ): Promise<Claim> {
     try {
       return (

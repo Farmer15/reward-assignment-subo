@@ -5,7 +5,7 @@ import { EventModule } from "./event/event.module";
 import { RewardModule } from "./reward/reward.module";
 import { ClaimModule } from "./claim/claim.module";
 import { JwtModule } from "@nestjs/jwt";
-import { JwtStrategy } from "apps/auth/src/auth/jwt.strategy";
+import { JwtStrategy } from "apps/gateway/src/auth/jwt.strategy";
 
 @Module({
   imports: [
