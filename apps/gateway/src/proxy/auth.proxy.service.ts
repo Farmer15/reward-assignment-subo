@@ -1,15 +1,10 @@
 import { HttpService } from "@nestjs/axios";
-import {
-  Injectable,
-  InternalServerErrorException,
-  UnauthorizedException,
-  BadRequestException,
-} from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { firstValueFrom } from "rxjs";
 import { CreateUserDto } from "apps/auth/src/user/dto/create-user.dto";
 import { LoginUserDto } from "apps/auth/src/user/dto/login-user.dto";
 import { UpdateUserRoleDto } from "apps/auth/src/user/dto/update-user-role.dto";
-import { AxiosError } from "axios";
+import { handleAxiosError } from "../common/utils/axios-error.util";
 
 @Injectable()
 export class AuthProxyService {
@@ -22,7 +17,7 @@ export class AuthProxyService {
       );
       return res.data;
     } catch (error) {
-      this.handleHttpError(error, "회원가입 중 오류가 발생했습니다.");
+      handleAxiosError(error, "회원가입 중 오류가 발생했습니다.");
     }
   }
 
@@ -33,7 +28,7 @@ export class AuthProxyService {
       );
       return res.data;
     } catch (error) {
-      this.handleHttpError(error, "로그인 요청 중 오류가 발생했습니다.");
+      handleAxiosError(error, "로그인 요청 중 오류가 발생했습니다.");
     }
   }
 
@@ -46,7 +41,7 @@ export class AuthProxyService {
       );
       return res.data;
     } catch (error) {
-      this.handleHttpError(error, "내 정보 조회 중 오류가 발생했습니다.");
+      handleAxiosError(error, "내 정보 조회 중 오류가 발생했습니다.");
     }
   }
 
@@ -59,24 +54,7 @@ export class AuthProxyService {
       );
       return res.data;
     } catch (error) {
-      this.handleHttpError(error, "유저 권한 변경 중 오류가 발생했습니다.");
+      handleAxiosError(error, "유저 권한 변경 중 오류가 발생했습니다.");
     }
-  }
-
-  private handleHttpError(error: unknown, defaultMessage: string): never {
-    if (error instanceof AxiosError && error.response) {
-      const status = error.response.status;
-      const message = error.response.data?.message || defaultMessage;
-
-      if (status === 400) {
-        throw new BadRequestException(message);
-      } else if (status === 401) {
-        throw new UnauthorizedException(message);
-      } else {
-        throw new InternalServerErrorException(message);
-      }
-    }
-
-    throw new InternalServerErrorException(defaultMessage);
   }
 }
