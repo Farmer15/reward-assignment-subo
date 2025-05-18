@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { CreateRewardDto } from "../../../../../libs/dto/create-reward.dto";
+import { CreateRewardDto } from "libs/dto/create-reward.dto";
 import { Reward } from "../schema/reward.schema";
 import { RewardCreateService } from "./reward-create.service";
 import { RewardFetchService } from "./reward-fetch.service";

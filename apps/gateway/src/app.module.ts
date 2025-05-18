@@ -9,13 +9,13 @@ import { AuthProxyService } from "./proxy/auth.proxy.service";
 import { JwtStrategy } from "./auth/jwt.strategy";
 import { APP_GUARD } from "@nestjs/core";
 import { JwtAuthGuard } from "./auth/jwt-auth.guard";
-import { RolesGuard } from "apps/gateway/src/auth/roles.guard";
 import { ClaimController } from "./controllers/claim.controller";
 import { ClaimProxyService } from "./proxy/claim.proxy.service";
 import { EventController } from "./controllers/event.controller";
 import { EventProxyService } from "./proxy/event.proxy.service";
-import { RewardService } from "apps/event/src/reward/reward.service";
 import { RewardController } from "./controllers/reward.controller";
+import { RewardProxyService } from "./proxy/reward.proxy.service";
+import { RolesGuard } from "./auth/roles.guard";
 
 @Module({
   imports: [
@@ -35,7 +35,7 @@ import { RewardController } from "./controllers/reward.controller";
     AuthProxyService,
     ClaimProxyService,
     EventProxyService,
-    RewardService,
+    RewardProxyService,
     JwtStrategy,
     {
       provide: APP_GUARD,

@@ -1,42 +1,46 @@
 import { Body, Controller, Get, Headers, Param, Patch, Post, UseGuards } from "@nestjs/common";
-import { CreateUserDto } from "apps/auth/src/user/dto/create-user.dto";
-import { LoginUserDto } from "apps/auth/src/user/dto/login-user.dto";
-import { UpdateUserRoleDto } from "apps/auth/src/user/dto/update-user-role.dto";
+import { CreateUserDto } from "libs/dto/create-user.dto";
+import { LoginUserDto } from "libs/dto/login-user.dto";
+import { UpdateUserRoleDto } from "libs/dto/update-user-role.dto";
 import { AuthProxyService } from "../proxy/auth.proxy.service";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RolesGuard } from "../auth/roles.guard";
+import { Roles } from "libs/decorators/roles.decorator";
 import { UserRole } from "apps/auth/src/user/types/user-role";
-import { Roles } from "libs/auth/src/decorators/roles.decorator";
+import { Public } from "libs/decorators/public.decorator";
+import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
+import { CurrentUser } from "libs/decorators/current-user.decorator";
 
 @Controller("auth")
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class AuthController {
   constructor(private readonly authProxyService: AuthProxyService) {}
 
+  @Public()
   @Post("signup")
   async signup(@Body() dto: CreateUserDto) {
-    return await this.authProxyService.signup(dto);
+    return this.authProxyService.signup(dto);
   }
 
+  @Public()
   @Post("login")
   async login(@Body() dto: LoginUserDto) {
-    return await this.authProxyService.login(dto);
+    return this.authProxyService.login(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get("me")
-  async getProfile(@Headers("authorization") authHeader: string) {
-    const token = authHeader?.split(" ")[1];
-    return await this.authProxyService.getProfile(token);
+  async getProfile(@CurrentUser() user: AuthUser) {
+    return this.authProxyService.getProfile(user);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Patch("users/:id/role")
   @Roles(UserRole.ADMIN, UserRole.OPERATOR)
   async updateRole(
-    @Param("id") userId: string,
+    @Param("id") targetUserId: string,
     @Body() dto: UpdateUserRoleDto,
-    @Headers("authorization") authHeader: string,
+    @CurrentUser() operator: AuthUser,
   ) {
-    const token = authHeader?.split(" ")[1];
-    return await this.authProxyService.updateUserRole(userId, dto, token);
+    return this.authProxyService.updateUserRole(targetUserId, dto, operator);
   }
 }

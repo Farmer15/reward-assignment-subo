@@ -1,10 +1,11 @@
 import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
 import { firstValueFrom } from "rxjs";
-import { CreateUserDto } from "apps/auth/src/user/dto/create-user.dto";
-import { LoginUserDto } from "apps/auth/src/user/dto/login-user.dto";
-import { UpdateUserRoleDto } from "apps/auth/src/user/dto/update-user-role.dto";
+import { CreateUserDto } from "libs/dto/create-user.dto";
+import { LoginUserDto } from "libs/dto/login-user.dto";
+import { UpdateUserRoleDto } from "libs/dto/update-user-role.dto";
 import { handleAxiosError } from "../common/utils/axios-error.util";
+import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
 
 @Injectable()
 export class AuthProxyService {
@@ -15,8 +16,10 @@ export class AuthProxyService {
       const res = await firstValueFrom(
         this.httpService.post(`${process.env.AUTH_SERVICE_URL}/auth/signup`, data),
       );
+
       return res.data;
     } catch (error) {
+      console.error(error);
       handleAxiosError(error, "회원가입 중 오류가 발생했습니다.");
     }
   }
@@ -26,34 +29,40 @@ export class AuthProxyService {
       const res = await firstValueFrom(
         this.httpService.post(`${process.env.AUTH_SERVICE_URL}/auth/login`, data),
       );
+
       return res.data;
     } catch (error) {
+      console.error(error);
       handleAxiosError(error, "로그인 요청 중 오류가 발생했습니다.");
     }
   }
 
-  async getProfile(token: string) {
-    try {
-      const res = await firstValueFrom(
-        this.httpService.get(`${process.env.AUTH_SERVICE_URL}/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      );
-      return res.data;
-    } catch (error) {
-      handleAxiosError(error, "내 정보 조회 중 오류가 발생했습니다.");
-    }
+  async getProfile(user: AuthUser) {
+    return {
+      message: "내 정보 조회 성공했습니다.",
+      user: {
+        id: user.userId,
+        email: user.email,
+        role: user.role,
+      },
+    };
   }
 
-  async updateUserRole(userId: string, dto: UpdateUserRoleDto, token: string) {
+  async updateUserRole(targetUserId: string, dto: UpdateUserRoleDto, operator: AuthUser) {
     try {
       const res = await firstValueFrom(
-        this.httpService.patch(`${process.env.AUTH_SERVICE_URL}/auth/users/${userId}/role`, dto, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
+        this.httpService.patch(
+          `${process.env.AUTH_SERVICE_URL}/auth/users/${targetUserId}/role`,
+          dto,
+          {
+            headers: { Authorization: `Bearer ${operator.token}` }, // 만약 JwtStrategy에서 token도 넣었다면
+          },
+        ),
       );
+
       return res.data;
     } catch (error) {
+      console.error(error);
       handleAxiosError(error, "유저 권한 변경 중 오류가 발생했습니다.");
     }
   }
