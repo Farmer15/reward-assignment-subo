@@ -1,20 +1,14 @@
-import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "apps/auth/src/auth/jwt-auth.guard";
-import { RolesGuard } from "libs/auth/src/guards/roles.guard";
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { ClaimService } from "./claim.service";
-import { Roles } from "libs/auth/src/decorators/roles.decorator";
 import { CurrentUser } from "libs/auth/src/decorators/current-user.decorator";
 import { AuthUser } from "apps/auth/src/types/auth-user.interface";
-import { UserRole } from "apps/auth/src/user/types/user-role";
 import { FilterClaimDto } from "./dto/filter-claim.dto";
 
 @Controller("claims")
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class ClaimHistoryController {
   constructor(private readonly claimService: ClaimService) {}
 
   @Get("me")
-  @Roles(UserRole.USER, UserRole.ADMIN, UserRole.OPERATOR, UserRole.AUDITOR)
   async getMyClaims(@CurrentUser() user: AuthUser) {
     const claims = await this.claimService.findClaimsByUser(user.userId);
     return {
@@ -24,7 +18,6 @@ export class ClaimHistoryController {
   }
 
   @Get()
-  @Roles(UserRole.OPERATOR, UserRole.AUDITOR, UserRole.ADMIN)
   async getAllClaims() {
     const claims = await this.claimService.findAllClaims();
     return {
@@ -34,7 +27,6 @@ export class ClaimHistoryController {
   }
 
   @Get("user/:userId")
-  @Roles(UserRole.OPERATOR, UserRole.AUDITOR, UserRole.ADMIN)
   async getClaimsByUser(@Param("userId") userId: string) {
     const claims = await this.claimService.findClaimsByUser(userId);
     return {
@@ -44,7 +36,6 @@ export class ClaimHistoryController {
   }
 
   @Get("filter")
-  @Roles(UserRole.ADMIN, UserRole.OPERATOR, UserRole.AUDITOR)
   async filterClaims(@Query() query: FilterClaimDto) {
     const claims = await this.claimService.findFilteredClaims(query);
 

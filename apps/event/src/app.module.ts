@@ -4,46 +4,35 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { EventModule } from "./event/event.module";
 import { RewardModule } from "./reward/reward.module";
 import { ClaimModule } from "./claim/claim.module";
-import { JwtModule } from "@nestjs/jwt";
-import { JwtStrategy } from "apps/gateway/src/auth/jwt.strategy";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: "1h" },
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+
     MongooseModule.forRootAsync({
       useFactory: async () => {
         const uri = process.env.MONGO_URI;
 
         if (!uri) {
-          Logger.error("❌ MONGO_URI is not defined in .env file");
+          Logger.error("❌ .env 파일에 MONGO_URI가 설정되어 있지 않습니다.");
           throw new Error("MONGO_URI is not defined");
         }
 
-        try {
-          Logger.log(`📡 Connecting to MongoDB: ${uri}`);
-          return {
-            uri,
-            connectionFactory: (connection) => {
-              Logger.log("✅ MongoDB 연결 성공했습니다. (event service)");
-              return connection;
-            },
-          };
-        } catch (error) {
-          Logger.error("❌ MongoDB 연결 실패했습니다.", error);
-          throw error;
-        }
+        Logger.log(`📡 MongoDB 연결 시도 중: ${uri}`);
+
+        return {
+          uri,
+          connectionFactory: (connection) => {
+            Logger.log("✅ MongoDB 연결에 성공했습니다. (event 서비스)");
+            return connection;
+          },
+        };
       },
     }),
+
     EventModule,
     RewardModule,
     ClaimModule,
   ],
-  providers: [JwtStrategy],
 })
 export class AppModule {}
