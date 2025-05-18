@@ -1,10 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { RewardService } from "./reward.service";
-import { CreateRewardDto } from "./dto/create-reward.dto";
-import { JwtAuthGuard } from "apps/gateway/src/auth/jwt-auth.guard";
-import { RolesGuard } from "apps/gateway/src/auth/roles.guard";
 import { UserRole } from "apps/auth/src/user/types/user-role";
-import { Roles } from "libs/auth/src/decorators/roles.decorator";
+import { Roles } from "libs/decorators/roles.decorator";
+import { RewardService } from "../services/reward.service";
+import { CreateRewardDto } from "libs/dto/create-reward.dto";
 
 @Controller("rewards")
 export class RewardController {

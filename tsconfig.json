@@ -9,11 +9,16 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": ".",
     "incremental": true,
     "strict": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@apps/*": ["src/apps/*"],
+      "@libs/*": ["src/libs/*"],
+      "@shared/*": ["src/shared/*"]
+    }
   },
   "exclude": ["node_modules", "dist"]
 }

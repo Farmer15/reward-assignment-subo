@@ -1,5 +1,5 @@
 import { IsString, IsDateString, IsIn, IsNumber, Min, IsNotEmpty, IsEnum } from "class-validator";
-import { EventCondition } from "../types/event-condition.enum";
+import { EventCondition } from "../../apps/event/src/event/types/event-condition.enum";
 
 export class CreateEventDto {
   @IsString()

@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { ClaimController } from "./claim.controller";
-import { ClaimService } from "./claim.service";
 import { Claim, ClaimSchema } from "./schema/claim.schema";
 import { Reward, RewardSchema } from "../reward/schema/reward.schema";
-import { ClaimHistoryController } from "./claim-history.controller";
+import { ClaimHistoryController } from "./controllers/claim-history.controller";
 import { EventSchema } from "../event/schemas/event.schema";
+import { ClaimQueryService } from "./services/claim-query.service";
+import { ClaimRewardService } from "./services/claim-reward.service";
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { EventSchema } from "../event/schemas/event.schema";
       { name: Event.name, schema: EventSchema },
     ]),
   ],
-  controllers: [ClaimController, ClaimHistoryController],
-  providers: [ClaimService],
+  controllers: [ClaimHistoryController, ClaimHistoryController],
+  providers: [ClaimQueryService, ClaimRewardService],
 })
 export class ClaimModule {}

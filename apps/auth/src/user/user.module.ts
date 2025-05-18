@@ -1,14 +1,25 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "./schemas/user.schema";
-import { UserController } from "./user.controller";
-import { UserService } from "./user.service";
-import { UserRoleController } from "./user-role.controller";
+import { UserRoleController } from "./controllers/user-role.controller";
+import { JwtModule } from "@nestjs/jwt";
+import { AuthController } from "./controllers/auth.controller";
+import { ProfileController } from "./controllers/profile.controller";
+import { UserCreateService } from "./services/user-create.service";
+import { UserAuthService } from "./services/user-auth.service";
+import { UserRoleService } from "./services/user-role.service";
+import { UserProfileService } from "./services/user-profile.service";
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
-  controllers: [UserController, UserRoleController],
-  providers: [UserService],
-  exports: [UserService],
+  imports: [
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: "1h" },
+    }),
+  ],
+  controllers: [AuthController, ProfileController, UserRoleController],
+  providers: [UserCreateService, UserAuthService, UserRoleService, UserProfileService],
+  exports: [UserCreateService, UserAuthService, UserRoleService, UserProfileService],
 })
 export class UserModule {}

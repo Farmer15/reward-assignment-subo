@@ -1,5 +1,5 @@
 import { IsEnum } from "class-validator";
-import { UserRole } from "../types/user-role";
+import { UserRole } from "../../apps/auth/src/user/types/user-role";
 
 export class UpdateUserRoleDto {
   @IsEnum(UserRole)
