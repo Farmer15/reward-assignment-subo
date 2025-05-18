@@ -25,7 +25,7 @@ export class UserService {
     const session = await this.connection.startSession();
 
     try {
-      let result;
+      let result: UpdateUserRoleResult | null = null;
 
       await session.withTransaction(async () => {
         const user = await this.userModel.findById(userId).session(session);
@@ -33,7 +33,8 @@ export class UserService {
           throw new NotFoundException("해당 ID의 유저를 찾을 수 없습니다.");
         }
 
-        if (!Object.values(UserRole).includes(role)) {
+        const isValidRole = Object.values(UserRole).includes(role);
+        if (!isValidRole) {
           throw new BadRequestException("유효하지 않은 역할입니다.");
         }
 
@@ -47,7 +48,7 @@ export class UserService {
         result = {
           message: "역할이 성공적으로 변경되었습니다.",
           user: {
-            id: updatedUser._id,
+            id: updatedUser.id,
             email: updatedUser.email,
             role: updatedUser.role,
           },
@@ -60,25 +61,32 @@ export class UserService {
 
       return result;
     } catch (error) {
-      throw error instanceof Error
-        ? error
-        : new InternalServerErrorException("역할 변경 중 서버 오류가 발생했습니다.");
+      console.error("역할 변경 오류:", error);
+      if (
+        error instanceof ConflictException ||
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException("역할 변경 중 서버 오류가 발생했습니다.");
     } finally {
       await session.endSession();
     }
   }
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const existing = await this.userModel.findOne({ email: createUserDto.email });
-    if (existing) {
-      throw new ConflictException("이미 존재하는 이메일입니다.");
-    }
-
-    if (createUserDto.password.length < 6) {
-      throw new BadRequestException("비밀번호는 최소 6자리 이상이어야 합니다.");
-    }
-
     try {
+      const existing = await this.userModel.findOne({ email: createUserDto.email });
+      if (existing) {
+        throw new ConflictException("이미 존재하는 이메일입니다.");
+      }
+
+      if (createUserDto.password.length < 6) {
+        throw new BadRequestException("비밀번호는 최소 6자리 이상이어야 합니다.");
+      }
+
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
       const createdUser = new this.userModel({
@@ -88,23 +96,37 @@ export class UserService {
 
       return await createdUser.save();
     } catch (error) {
+      console.error("회원가입 오류:", error);
+      if (error instanceof ConflictException || error instanceof BadRequestException) {
+        throw error;
+      }
+
       throw new InternalServerErrorException("회원가입 중 서버 오류가 발생했습니다.");
     }
   }
 
   async validateUser(email: string, password: string): Promise<UserDocument> {
-    const user = await this.userModel.findOne({ email });
+    try {
+      const user = await this.userModel.findOne({ email });
 
-    if (!user) {
-      throw new UnauthorizedException("해당 이메일로 등록된 유저가 없습니다.");
+      if (!user) {
+        throw new UnauthorizedException("해당 이메일로 등록된 유저가 없습니다.");
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
+      }
+
+      return user;
+    } catch (error) {
+      console.error("로그인 검증 오류:", error);
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException("로그인 검증 중 서버 오류가 발생했습니다.");
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
-    }
-
-    return user;
   }
 }

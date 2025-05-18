@@ -3,7 +3,6 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UserService } from "./user.service";
 import { JwtService } from "@nestjs/jwt";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CurrentUser } from "libs/auth/src/decorators/current-user.decorator";
 import { AuthUser } from "../types/auth-user.interface";
 
@@ -45,7 +44,6 @@ export class UserController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get("me")
   getProfile(@CurrentUser() user: AuthUser) {
     return {
