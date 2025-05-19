@@ -12,7 +12,10 @@ export class BirthdayLoginValidator {
 
   async isBirthdayToday(userId: string): Promise<boolean> {
     const user = await this.userModel.findById(userId).lean();
-    if (!user || !user.birthDate) return false;
+
+    if (!user || !user.birthDate) {
+      return false;
+    }
 
     const today = new Date();
     const birth = new Date(user.birthDate);

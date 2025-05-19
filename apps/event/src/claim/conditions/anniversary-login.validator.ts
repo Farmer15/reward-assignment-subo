@@ -12,7 +12,10 @@ export class AnniversaryLoginValidator {
 
   async isAnniversaryToday(userId: string): Promise<boolean> {
     const user = await this.userModel.findById(userId).lean();
-    if (!user || !user.createdAt) return false;
+
+    if (!user || !user.createdAt) {
+      return false;
+    }
 
     const today = new Date();
     const created = new Date(user.createdAt);

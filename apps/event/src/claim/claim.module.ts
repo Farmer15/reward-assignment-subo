@@ -11,6 +11,7 @@ import { UserLogin, UserLoginSchema } from "libs/schemas/user-login.schema";
 import { LoginStreakValidator } from "./conditions/login-streak.validator";
 import { BirthdayLoginValidator } from "./conditions/birthday-login.validator";
 import { AnniversaryLoginValidator } from "./conditions/anniversary-login.validator";
+import { CompleteProfileValidator } from "./conditions/complete-profile.validator";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AnniversaryLoginValidator } from "./conditions/anniversary-login.valida
     LoginStreakValidator,
     BirthdayLoginValidator,
     AnniversaryLoginValidator,
+    CompleteProfileValidator,
   ],
 })
 export class ClaimModule {}

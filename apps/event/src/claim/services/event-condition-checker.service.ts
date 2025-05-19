@@ -3,6 +3,7 @@ import { EventCondition } from "../../event/types/event-condition.enum";
 import { LoginStreakValidator } from "../conditions/login-streak.validator";
 import { BirthdayLoginValidator } from "../conditions/birthday-login.validator";
 import { AnniversaryLoginValidator } from "../conditions/anniversary-login.validator";
+import { CompleteProfileValidator } from "../conditions/complete-profile.validator";
 
 @Injectable()
 export class EventConditionCheckerService {
@@ -10,6 +11,7 @@ export class EventConditionCheckerService {
     private readonly loginStreakValidator: LoginStreakValidator,
     private readonly birthdayLoginValidator: BirthdayLoginValidator,
     private readonly anniversaryLoginValidator: AnniversaryLoginValidator,
+    private readonly completeProfileValidator: CompleteProfileValidator,
   ) {}
 
   async check(userId: string, condition: EventCondition): Promise<boolean> {
@@ -22,18 +24,9 @@ export class EventConditionCheckerService {
 
         return true;
       case EventCondition.COMPLETE_PROFILE:
-        // 조건 로직들
+        return this.completeProfileValidator.isProfileComplete(userId);
 
-        return true;
       case EventCondition.WRITE_REVIEW:
-        // 조건 로직들
-
-        return true;
-      case EventCondition.SUBMIT_FEEDBACK:
-        // 조건 로직들
-
-        return true;
-      case EventCondition.COMPLETE_TUTORIAL:
         // 조건 로직들
 
         return true;
