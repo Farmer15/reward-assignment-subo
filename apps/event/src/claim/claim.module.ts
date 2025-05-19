@@ -13,7 +13,7 @@ import { BirthdayLoginValidator } from "./conditions/birthday-login.validator";
 import { AnniversaryLoginValidator } from "./conditions/anniversary-login.validator";
 import { CompleteProfileValidator } from "./conditions/complete-profile.validator";
 import { Referral, ReferralSchema } from "libs/schemas/referral.schema";
-import { ReferFriendValidator } from "./conditions/refer-friend.validator";
+import { ReferralValidator } from "./conditions/refer-friend.validator";
 
 @Module({
   imports: [
@@ -34,7 +34,7 @@ import { ReferFriendValidator } from "./conditions/refer-friend.validator";
     BirthdayLoginValidator,
     AnniversaryLoginValidator,
     CompleteProfileValidator,
-    ReferFriendValidator
+    ReferralValidator,
   ],
 })
 export class ClaimModule {}

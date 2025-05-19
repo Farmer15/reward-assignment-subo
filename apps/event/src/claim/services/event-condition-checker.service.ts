@@ -5,6 +5,7 @@ import { BirthdayLoginValidator } from "../conditions/birthday-login.validator";
 import { AnniversaryLoginValidator } from "../conditions/anniversary-login.validator";
 import { CompleteProfileValidator } from "../conditions/complete-profile.validator";
 import { ReferralValidator } from "../conditions/refer-friend.validator";
+import { ReturnUserValidator } from "../conditions/return-user.validator";
 
 @Injectable()
 export class EventConditionCheckerService {
@@ -14,6 +15,7 @@ export class EventConditionCheckerService {
     private readonly anniversaryLoginValidator: AnniversaryLoginValidator,
     private readonly completeProfileValidator: CompleteProfileValidator,
     private readonly referralValidator: ReferralValidator,
+    private readonly returnUserValidator: ReturnUserValidator,
   ) {}
 
   async check(userId: string, condition: EventCondition): Promise<boolean> {
@@ -32,6 +34,9 @@ export class EventConditionCheckerService {
 
       case EventCondition.ANNIVERSARY_LOGIN:
         return this.anniversaryLoginValidator.isAnniversaryToday(userId);
+
+      case EventCondition.RETURN_USER_LOGIN:
+        return this.returnUserValidator.isReturnedAfterInactivity(userId);
 
       default:
         return false;
