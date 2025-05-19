@@ -11,6 +11,7 @@ export class UserCreateService {
 
   async create(dto: CreateUserDto): Promise<UserDocument> {
     const existing = await this.userModel.findOne({ email: dto.email });
+
     if (existing) {
       throw new ConflictException("이미 존재하는 이메일입니다.");
     }
@@ -24,6 +25,7 @@ export class UserCreateService {
     const createdUser = new this.userModel({
       email: dto.email,
       password: hashedPassword,
+      birthDate: dto.birthDate,
     });
 
     return await createdUser.save();

@@ -9,6 +9,7 @@ import { ClaimRewardService } from "./services/claim-reward.service";
 import { EventConditionCheckerService } from "./services/event-condition-checker.service";
 import { UserLogin, UserLoginSchema } from "libs/schemas/user-login.schema";
 import { LoginStreakValidator } from "./conditions/login-streak.validator";
+import { BirthdayLoginValidator } from "./conditions/birthday-login.validator";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { LoginStreakValidator } from "./conditions/login-streak.validator";
     ClaimRewardService,
     EventConditionCheckerService,
     LoginStreakValidator,
+    BirthdayLoginValidator,
   ],
 })
 export class ClaimModule {}
