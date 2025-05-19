@@ -11,6 +11,9 @@ export class Claim {
   @Prop({ type: Types.ObjectId, required: true, ref: "Reward" })
   rewardId: Types.ObjectId = new Types.ObjectId();
 
+  @Prop({ type: Types.ObjectId, ref: "Event", required: true })
+  eventId!: Types.ObjectId;
+
   @Prop({ enum: ["success", "failed"], required: true })
   status: "success" | "failed" = "failed";
 
@@ -19,3 +22,5 @@ export class Claim {
 }
 
 export const ClaimSchema = SchemaFactory.createForClass(Claim);
+
+ClaimSchema.index({ userId: 1, eventId: 1 }, { unique: true });
