@@ -18,6 +18,15 @@ export class User {
   @Prop({ type: Date, required: true })
   birthDate!: Date;
 
+  @Prop({ default: "" })
+  nickname?: string;
+
+  @Prop({ default: "" })
+  bio?: string;
+
+  @Prop({ default: "" })
+  profileImageUrl?: string;
+
   createdAt?: Date;
   updatedAt?: Date;
 }

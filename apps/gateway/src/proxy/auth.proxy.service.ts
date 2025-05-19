@@ -6,6 +6,7 @@ import { LoginUserDto } from "libs/dto/login-user.dto";
 import { UpdateUserRoleDto } from "libs/dto/update-user-role.dto";
 import { handleAxiosError } from "../common/utils/axios-error.util";
 import { AuthUser } from "libs/types/auth-user.interface";
+import { UpdateUserProfileDto } from "libs/dto/update-user-profile.dto";
 
 @Injectable()
 export class AuthProxyService {
@@ -46,6 +47,23 @@ export class AuthProxyService {
         role: user.role,
       },
     };
+  }
+
+  async updateUserProfile(user: AuthUser, dto: UpdateUserProfileDto) {
+    try {
+      const res = await firstValueFrom(
+        this.httpService.patch(`${process.env.AUTH_SERVICE_URL}/auth/profile`, dto, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }),
+      );
+
+      return res.data;
+    } catch (error) {
+      console.error(error);
+      handleAxiosError(error, "프로필 수정 중 오류가 발생했습니다.");
+    }
   }
 
   async updateUserRole(targetUserId: string, dto: UpdateUserRoleDto, operator: AuthUser) {

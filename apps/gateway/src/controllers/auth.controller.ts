@@ -10,6 +10,7 @@ import { Public } from "libs/decorators/public.decorator";
 import { AuthUser } from "libs/types/auth-user.interface";
 import { CurrentUser } from "libs/decorators/current-user.decorator";
 import { UserRole } from "libs/types/user-role";
+import { UpdateUserProfileDto } from "libs/dto/update-user-profile.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -31,6 +32,12 @@ export class AuthController {
   @Get("me")
   async getProfile(@CurrentUser() user: AuthUser) {
     return this.authProxyService.getProfile(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch("profile")
+  async updateProfile(@CurrentUser() user: AuthUser, @Body() dto: UpdateUserProfileDto) {
+    return this.authProxyService.updateUserProfile(user, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
