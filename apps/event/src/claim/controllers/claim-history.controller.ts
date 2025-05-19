@@ -1,8 +1,8 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { CurrentUser } from "libs/decorators/current-user.decorator";
-import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
 import { ClaimQueryService } from "../services/claim-query.service";
 import { FilterClaimDto } from "libs/dto/filter-claim.dto";
+import { AuthUser } from "libs/types/auth-user.interface";
 
 @Controller("claims")
 export class ClaimHistoryController {

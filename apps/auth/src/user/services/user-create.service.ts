@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
-import { User, UserDocument } from "../schemas/user.schema";
+import { User, UserDocument } from "../../../../../libs/schemas/user.schema";
 import { CreateUserDto } from "libs/dto/create-user.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import * as bcrypt from "bcrypt";

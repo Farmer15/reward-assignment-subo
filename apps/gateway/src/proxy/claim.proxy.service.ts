@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { FilterClaimDto } from "libs/dto/filter-claim.dto";
 import { firstValueFrom } from "rxjs";
 import { handleAxiosError } from "../common/utils/axios-error.util";
-import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
+import { AuthUser } from "libs/types/auth-user.interface";
 
 @Injectable()
 export class ClaimProxyService {

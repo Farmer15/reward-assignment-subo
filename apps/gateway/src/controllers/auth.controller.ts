@@ -6,10 +6,10 @@ import { AuthProxyService } from "../proxy/auth.proxy.service";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RolesGuard } from "../auth/roles.guard";
 import { Roles } from "libs/decorators/roles.decorator";
-import { UserRole } from "apps/auth/src/user/types/user-role";
 import { Public } from "libs/decorators/public.decorator";
-import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
+import { AuthUser } from "libs/types/auth-user.interface";
 import { CurrentUser } from "libs/decorators/current-user.decorator";
+import { UserRole } from "libs/types/user-role";
 
 @Controller("auth")
 export class AuthController {

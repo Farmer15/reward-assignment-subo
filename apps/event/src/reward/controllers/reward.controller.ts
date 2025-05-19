@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { UserRole } from "apps/auth/src/user/types/user-role";
 import { Roles } from "libs/decorators/roles.decorator";
 import { RewardService } from "../services/reward.service";
 import { CreateRewardDto } from "libs/dto/create-reward.dto";
+import { UserRole } from "libs/types/user-role";
 
 @Controller("rewards")
 export class RewardController {

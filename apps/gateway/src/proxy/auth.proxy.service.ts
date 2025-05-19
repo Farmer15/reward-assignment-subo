@@ -5,7 +5,7 @@ import { CreateUserDto } from "libs/dto/create-user.dto";
 import { LoginUserDto } from "libs/dto/login-user.dto";
 import { UpdateUserRoleDto } from "libs/dto/update-user-role.dto";
 import { handleAxiosError } from "../common/utils/axios-error.util";
-import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
+import { AuthUser } from "libs/types/auth-user.interface";
 
 @Injectable()
 export class AuthProxyService {

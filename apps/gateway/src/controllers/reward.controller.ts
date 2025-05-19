@@ -2,11 +2,11 @@ import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RolesGuard } from "../auth/roles.guard";
 import { Roles } from "libs/decorators/roles.decorator";
-import { UserRole } from "apps/auth/src/user/types/user-role";
 import { CreateRewardDto } from "libs/dto/create-reward.dto";
 import { RewardProxyService } from "../proxy/reward.proxy.service";
 import { CurrentUser } from "libs/decorators/current-user.decorator";
-import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
+import { AuthUser } from "libs/types/auth-user.interface";
+import { UserRole } from "libs/types/user-role";
 
 @Controller("rewards")
 @UseGuards(JwtAuthGuard, RolesGuard)

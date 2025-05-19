@@ -10,8 +10,8 @@ import { Claim, ClaimDocument } from "../schema/claim.schema";
 import { Connection, Model, Types } from "mongoose";
 import { Reward, RewardDocument } from "../../reward/schema/reward.schema";
 import { EventDocument } from "../../event/schemas/event.schema";
-import { checkEventCondition } from "../helpers/check-event-condition";
 import { saveFailedClaim } from "../helpers/save-failed-claim";
+import { EventConditionCheckerService } from "./event-condition-checker.service";
 
 @Injectable()
 export class ClaimRewardService {
@@ -20,6 +20,7 @@ export class ClaimRewardService {
     @InjectModel(Reward.name) private rewardModel: Model<RewardDocument>,
     @InjectModel(Event.name) private eventModel: Model<EventDocument>,
     @InjectConnection() private readonly connection: Connection,
+    private readonly eventConditionChecker: EventConditionCheckerService,
   ) {}
 
   async execute(userId: string, rewardId: string): Promise<Claim> {
@@ -47,7 +48,8 @@ export class ClaimRewardService {
           throw new Error("이벤트 기간이 아닙니다.");
         }
 
-        const meetsCondition = await checkEventCondition(userId, event.condition);
+        const meetsCondition = await this.eventConditionChecker.check(userId, event.condition);
+
         if (!meetsCondition) {
           throw new Error("이벤트 조건을 만족하지 못했습니다.");
         }

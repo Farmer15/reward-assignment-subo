@@ -1,12 +1,12 @@
 import { Controller, Post, Param, Get, Query, UseGuards } from "@nestjs/common";
 import { CurrentUser } from "libs/decorators/current-user.decorator";
-import { AuthUser } from "apps/auth/src/user/types/auth-user.interface";
+import { AuthUser } from "libs/types/auth-user.interface";
 import { FilterClaimDto } from "libs/dto/filter-claim.dto";
 import { ClaimProxyService } from "../proxy/claim.proxy.service";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { RolesGuard } from "../auth/roles.guard";
 import { Roles } from "libs/decorators/roles.decorator";
-import { UserRole } from "apps/auth/src/user/types/user-role";
+import { UserRole } from "libs/types/user-role";
 
 @Controller("claims")
 @UseGuards(JwtAuthGuard, RolesGuard)
