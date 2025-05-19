@@ -12,6 +12,8 @@ import { LoginStreakValidator } from "./conditions/login-streak.validator";
 import { BirthdayLoginValidator } from "./conditions/birthday-login.validator";
 import { AnniversaryLoginValidator } from "./conditions/anniversary-login.validator";
 import { CompleteProfileValidator } from "./conditions/complete-profile.validator";
+import { Referral, ReferralSchema } from "libs/schemas/referral.schema";
+import { ReferFriendValidator } from "./conditions/refer-friend.validator";
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { CompleteProfileValidator } from "./conditions/complete-profile.validato
       { name: Reward.name, schema: RewardSchema },
       { name: Event.name, schema: EventSchema },
       { name: UserLogin.name, schema: UserLoginSchema },
+      { name: Referral.name, schema: ReferralSchema },
     ]),
   ],
   controllers: [ClaimHistoryController, ClaimHistoryController],
@@ -31,6 +34,7 @@ import { CompleteProfileValidator } from "./conditions/complete-profile.validato
     BirthdayLoginValidator,
     AnniversaryLoginValidator,
     CompleteProfileValidator,
+    ReferFriendValidator
   ],
 })
 export class ClaimModule {}

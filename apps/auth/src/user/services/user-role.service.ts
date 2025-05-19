@@ -6,10 +6,10 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "../../../../../libs/schemas/user.schema";
 import { Connection, Model } from "mongoose";
 import { UserRole } from "libs/types/user-role";
 import { UpdateUserRoleResult } from "libs/types/user-service.types";
+import { User, UserDocument } from "libs/schemas/user.schema";
 
 @Injectable()
 export class UserRoleService {

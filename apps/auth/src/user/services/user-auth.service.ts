@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "../../../../../libs/schemas/user.schema";
 import * as bcrypt from "bcrypt";
+import { UserLogin, UserLoginDocument } from "libs/schemas/user-login.schema";
+import { User, UserDocument } from "libs/schemas/user.schema";
 import { Model } from "mongoose";
-import { UserLogin, UserLoginDocument } from "../../../../../libs/schemas/user-login.schema";
 
 @Injectable()
 export class UserAuthService {

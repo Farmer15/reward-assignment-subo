@@ -49,6 +49,20 @@ export class AuthProxyService {
     };
   }
 
+  async getInviteCode(user: AuthUser) {
+    try {
+      const res = await firstValueFrom(
+        this.httpService.get(`${process.env.AUTH_SERVICE_URL}/auth/invite-code`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }),
+      );
+
+      return res.data;
+    } catch (error) {
+      handleAxiosError(error, "추천 코드 조회 중 오류가 발생했습니다.");
+    }
+  }
+
   async updateUserProfile(user: AuthUser, dto: UpdateUserProfileDto) {
     try {
       const res = await firstValueFrom(
@@ -73,7 +87,7 @@ export class AuthProxyService {
           `${process.env.AUTH_SERVICE_URL}/auth/users/${targetUserId}/role`,
           dto,
           {
-            headers: { Authorization: `Bearer ${operator.token}` }, // 만약 JwtStrategy에서 token도 넣었다면
+            headers: { Authorization: `Bearer ${operator.token}` },
           },
         ),
       );

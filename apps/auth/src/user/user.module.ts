@@ -10,12 +10,14 @@ import { UserAuthService } from "./services/user-auth.service";
 import { UserRoleService } from "./services/user-role.service";
 import { UserProfileService } from "./services/user-profile.service";
 import { UserLogin, UserLoginSchema } from "../../../../libs/schemas/user-login.schema";
+import { Referral, ReferralSchema } from "libs/schemas/referral.schema";
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: UserLogin.name, schema: UserLoginSchema },
+      { name: Referral.name, schema: ReferralSchema },
     ]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,

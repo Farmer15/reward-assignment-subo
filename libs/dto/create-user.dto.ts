@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsDate } from "class-validator";
+import { IsEmail, IsString, MinLength, IsDate, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
 
 export class CreateUserDto {
@@ -12,4 +12,8 @@ export class CreateUserDto {
   @Type(() => Date)
   @IsDate()
   birthDate!: Date;
+
+  @IsOptional()
+  @IsString()
+  inviteCode?: string;
 }

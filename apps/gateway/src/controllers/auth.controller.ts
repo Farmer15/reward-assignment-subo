@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
 import { CreateUserDto } from "libs/dto/create-user.dto";
 import { LoginUserDto } from "libs/dto/login-user.dto";
 import { UpdateUserRoleDto } from "libs/dto/update-user-role.dto";
@@ -38,6 +38,12 @@ export class AuthController {
   @Patch("profile")
   async updateProfile(@CurrentUser() user: AuthUser, @Body() dto: UpdateUserProfileDto) {
     return this.authProxyService.updateUserProfile(user, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("invite-code")
+  async getInviteCode(@CurrentUser() user: AuthUser) {
+    return this.authProxyService.getInviteCode(user);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

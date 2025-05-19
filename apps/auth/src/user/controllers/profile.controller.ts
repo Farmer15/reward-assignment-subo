@@ -11,6 +11,7 @@ export class ProfileController {
   @Get("me")
   async getProfile(@CurrentUser() user: AuthUser) {
     const profile = await this.userProfileService.getProfile(user.userId);
+
     return {
       message: "내 정보 조회 성공했습니다.",
       user: {
@@ -34,6 +35,16 @@ export class ProfileController {
         bio: updated.bio,
         profileImageUrl: updated.profileImageUrl,
       },
+    };
+  }
+
+  @Get("invite-code")
+  async getInviteCode(@CurrentUser() user: AuthUser) {
+    const code = await this.userProfileService.getInviteCode(user.userId);
+
+    return {
+      message: "추천 코드 조회에 성공했습니다.",
+      code,
     };
   }
 }

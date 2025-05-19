@@ -2,12 +2,13 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { User, UserDocument } from "../../../../../libs/schemas/user.schema";
 import { isValidObjectId, Model } from "mongoose";
 import { UpdateUserProfileDto } from "libs/dto/update-user-profile.dto";
+import { User, UserDocument } from "libs/schemas/user.schema";
 
 @Injectable()
 export class UserProfileService {
@@ -71,5 +72,28 @@ export class UserProfileService {
     }
 
     return user;
+  }
+
+  async getInviteCode(userId: string): Promise<string> {
+    try {
+      const user = await this.userModel.findById(userId).lean();
+
+      if (!user) {
+        throw new NotFoundException("유저를 찾을 수 없습니다.");
+      }
+
+      if (typeof user.inviteCode !== "string" || user.inviteCode.trim() === "") {
+        throw new InternalServerErrorException("추천 코드가 존재하지 않습니다.");
+      }
+
+      return user.inviteCode;
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof InternalServerErrorException) {
+        throw error;
+      }
+
+      console.error("초대 코드 조회 중 알 수 없는 오류:", error);
+      throw new InternalServerErrorException("추천 코드 조회 중 오류가 발생했습니다.");
+    }
   }
 }
