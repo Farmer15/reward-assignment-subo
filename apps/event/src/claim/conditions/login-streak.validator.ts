@@ -7,15 +7,15 @@ import { UserLogin, UserLoginDocument } from "libs/schemas/user-login.schema";
 export class LoginStreakValidator {
   constructor(
     @InjectModel(UserLogin.name)
-    private userLoginModel: Model<UserLoginDocument>,
+    private readonly userLoginModel: Model<UserLoginDocument>,
   ) {}
 
-  async has7DayLoginStreak(userId: string): Promise<boolean> {
+  async hasContinuousLoginStreak(userId: string, days: number): Promise<boolean> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const start = new Date(today);
-    start.setDate(today.getDate() - 6);
+    start.setDate(today.getDate() - (days - 1));
 
     const logs = await this.userLoginModel
       .find({
@@ -48,6 +48,6 @@ export class LoginStreakValidator {
       prevDate = currDate;
     }
 
-    return count === 7;
+    return count === days;
   }
 }
