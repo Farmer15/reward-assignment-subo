@@ -10,6 +10,7 @@ import { EventConditionCheckerService } from "./services/event-condition-checker
 import { UserLogin, UserLoginSchema } from "libs/schemas/user-login.schema";
 import { LoginStreakValidator } from "./conditions/login-streak.validator";
 import { BirthdayLoginValidator } from "./conditions/birthday-login.validator";
+import { AnniversaryLoginValidator } from "./conditions/anniversary-login.validator";
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { BirthdayLoginValidator } from "./conditions/birthday-login.validator";
     EventConditionCheckerService,
     LoginStreakValidator,
     BirthdayLoginValidator,
+    AnniversaryLoginValidator,
   ],
 })
 export class ClaimModule {}

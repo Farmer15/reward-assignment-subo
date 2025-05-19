@@ -17,6 +17,9 @@ export class User {
 
   @Prop({ type: Date, required: true })
   birthDate!: Date;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,16 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { EventCondition } from "../../event/types/event-condition.enum";
 import { LoginStreakValidator } from "../conditions/login-streak.validator";
-import { User, UserDocument } from "libs/schemas/user.schema";
-import { Model } from "mongoose";
-import { InjectModel } from "@nestjs/mongoose";
 import { BirthdayLoginValidator } from "../conditions/birthday-login.validator";
+import { AnniversaryLoginValidator } from "../conditions/anniversary-login.validator";
 
 @Injectable()
 export class EventConditionCheckerService {
   constructor(
     private readonly loginStreakValidator: LoginStreakValidator,
     private readonly birthdayLoginValidator: BirthdayLoginValidator,
+    private readonly anniversaryLoginValidator: AnniversaryLoginValidator,
   ) {}
 
   async check(userId: string, condition: EventCondition): Promise<boolean> {
@@ -40,10 +39,10 @@ export class EventConditionCheckerService {
         return true;
       case EventCondition.BIRTHDAY_LOGIN:
         return this.birthdayLoginValidator.isBirthdayToday(userId);
-      case EventCondition.ANNIVERSARY_LOGIN:
-        // 조건 로직들
 
-        return true;
+      case EventCondition.ANNIVERSARY_LOGIN:
+        return this.anniversaryLoginValidator.isAnniversaryToday(userId);
+
       default:
         return false;
     }
