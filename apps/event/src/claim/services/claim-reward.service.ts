@@ -10,8 +10,8 @@ import { Claim, ClaimDocument } from "../schema/claim.schema";
 import { ClientSession, Connection, Model, Types } from "mongoose";
 import { Reward, RewardDocument } from "../../reward/schema/reward.schema";
 import { Event, EventDocument } from "../../event/schemas/event.schema";
-import { saveFailedClaim } from "../helpers/save-failed-claim";
 import { EventConditionCheckerService } from "./event-condition-checker.service";
+import { saveFailedClaim } from "../helpers/save-failed-claim";
 
 @Injectable()
 export class ClaimRewardService {
@@ -25,36 +25,47 @@ export class ClaimRewardService {
 
   async execute(userId: string, rewardId: string): Promise<Claim> {
     const session = await this.connection.startSession();
-    let claim: Claim;
+    session.startTransaction();
 
     try {
-      await session.withTransaction(async () => {
-        const reward = await this.getValidReward(rewardId, session);
-        const event = await this.getValidEvent(reward.eventId, session);
+      const reward = await this.getValidReward(rewardId, session);
+      const event = await this.getValidEvent(reward.eventId, session);
 
-        this.validateEventPeriod(event);
-        await this.ensureConditionMet(userId, event.condition);
-        await this.ensureNotAlreadyClaimed(userId, event.id, session);
+      this.validateEventPeriod(event);
+      await this.ensureConditionMet(userId, event.condition);
+      await this.ensureNotAlreadyClaimed(userId, event.id, session);
 
-        if (reward.isLimited) {
-          await this.decrementRewardQuantityIfAvailable(reward.id, session);
-        }
-
-        claim = await this.createClaim(userId, rewardId, event.id, session);
-      });
-
-      return claim!;
-    } catch (error) {
-      let message = "알 수 없는 오류";
-
-      if (error && typeof error === "object" && "code" in error && error.code === 11000) {
-        message = "이미 해당 이벤트에 대한 보상을 수령하셨습니다.";
-      } else if (error instanceof Error) {
-        message = error.message;
+      if (reward.isLimited) {
+        await this.decrementRewardQuantityIfAvailable(reward.id, session);
       }
 
-      await saveFailedClaim(this.claimModel, userId, rewardId, message);
-      this.rethrowFormattedError(message);
+      const claim = await this.createClaim(userId, rewardId, event.id, session);
+
+      await session.commitTransaction();
+      return claim;
+    } catch (error) {
+      await session.abortTransaction();
+
+      // NestJS 예외면 그대로 throw
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+
+      // 그 외에는 에러 기록 후 포장
+      const message =
+        error instanceof Error ? error.message : "보상 요청 처리 중 알 수 없는 오류입니다.";
+
+      try {
+        await saveFailedClaim(this.claimModel, userId, rewardId, message);
+      } catch (saveError) {
+        console.error("보상 이력 저장 실패:", saveError);
+      }
+
+      throw new InternalServerErrorException("보상 요청 처리 중 오류가 발생했습니다.");
     } finally {
       await session.endSession();
     }
@@ -64,7 +75,7 @@ export class ClaimRewardService {
     const reward = await this.rewardModel.findById(rewardId).session(session);
 
     if (!reward) {
-      throw new Error("보상을 찾을 수 없습니다.");
+      throw new NotFoundException("보상을 찾을 수 없습니다.");
     }
     return reward;
   }
@@ -73,11 +84,11 @@ export class ClaimRewardService {
     const event = await this.eventModel.findById(eventId).session(session);
 
     if (!event) {
-      throw new Error("보상과 연결된 이벤트를 찾을 수 없습니다.");
+      throw new NotFoundException("보상과 연결된 이벤트를 찾을 수 없습니다.");
     }
 
     if (event.status !== "active") {
-      throw new Error("현재 비활성화된 이벤트입니다.");
+      throw new BadRequestException("현재 비활성화된 이벤트입니다.");
     }
 
     return event;
@@ -87,7 +98,7 @@ export class ClaimRewardService {
     const now = new Date();
 
     if (now < event.startDate || now > event.endDate) {
-      throw new Error("이벤트 기간이 아닙니다.");
+      throw new BadRequestException("이벤트 기간이 아닙니다.");
     }
   }
 
@@ -95,7 +106,7 @@ export class ClaimRewardService {
     const ok = await this.eventConditionChecker.check(userId, condition);
 
     if (!ok) {
-      throw new Error("이벤트 조건을 만족하지 못했습니다.");
+      throw new BadRequestException("이벤트 조건을 만족하지 못했습니다.");
     }
   }
 
@@ -104,12 +115,12 @@ export class ClaimRewardService {
     eventId: Types.ObjectId,
     session: ClientSession,
   ) {
-    const exists = await this.claimModel
-      .exists({ userId: new Types.ObjectId(userId), eventId })
+    const existingClaim = await this.claimModel
+      .findOne({ userId: new Types.ObjectId(userId), eventId })
       .session(session);
 
-    if (exists) {
-      throw new Error("이미 해당 이벤트에 대한 보상을 수령하셨습니다.");
+    if (existingClaim) {
+      throw new ConflictException("이미 해당 이벤트에 대한 보상을 수령하셨습니다.");
     }
   }
 
@@ -124,7 +135,7 @@ export class ClaimRewardService {
     );
 
     if (result.modifiedCount === 0) {
-      throw new Error("보상이 모두 소진되었습니다.");
+      throw new BadRequestException("보상이 모두 소진되었습니다.");
     }
   }
 
