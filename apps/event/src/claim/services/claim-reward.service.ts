@@ -46,7 +46,6 @@ export class ClaimRewardService {
     } catch (error) {
       await session.abortTransaction();
 
-      // NestJS 예외면 그대로 throw
       if (
         error instanceof ConflictException ||
         error instanceof BadRequestException ||
@@ -55,7 +54,6 @@ export class ClaimRewardService {
         throw error;
       }
 
-      // 그 외에는 에러 기록 후 포장
       const message =
         error instanceof Error ? error.message : "보상 요청 처리 중 알 수 없는 오류입니다.";
 
