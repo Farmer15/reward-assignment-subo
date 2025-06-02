@@ -4,12 +4,6 @@
 >  ??? 기업과제 입니다.(보안상 기입하지 않았습니다). <br/>
 > <br>
 
-<div aling="left">
-<img width="700" src="https://i.namu.wiki/i/NUzo8Y8CQrxIjuZF9SlDK1ciyYMegj3PRFRi4x6qd6ll4C-jY3BEk4sPPACnrYCwWvbIZDYM49XSqT6gkBaNmg.webp" >
-</div>
-<div align="center">
-<p>
-
 PM 또는 요구사항을 처음 접하는 분들도 <strong>이해하기 쉽게 작성</strong>되었으며 이해를 돕기 위해 내용이 중복되더라도 <strong>상세하고 구체적으로 작성</strong>하였습니다. <br>
 
 </p>
